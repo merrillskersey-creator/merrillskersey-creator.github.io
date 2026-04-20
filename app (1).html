@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Travel AI | Merrill Kersey</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --forest: #1e4d2b;
+      --forest-light: #2d6b3f;
+      --sky: #e8f4fd;
+      --sand: #f5ede0;
+      --accent: #e07b39;
+      --white: #ffffff;
+      --gray: #f0f0ec;
+      --text: #1a1a1a;
+      --muted: #6b7280;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Inter', sans-serif; background: var(--gray); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; }
+
+    nav { background: var(--forest); padding: 0.9rem 2rem; display: flex; justify-content: space-between; align-items: center; }
+    nav .brand { font-family: 'Playfair Display', serif; color: #d4e8c2; font-size: 1.25rem; text-decoration: none; }
+    nav .nav-links a { color: rgba(255,255,255,0.8); text-decoration: none; margin-left: 1.5rem; font-size: 0.88rem; font-weight: 500; transition: color 0.2s; }
+    nav .nav-links a:hover { color: #fff; }
+
+    .app-hero { background: linear-gradient(135deg, var(--forest) 0%, #3a7a4a 100%); color: white; padding: 3rem 2rem 2rem; text-align: center; }
+    .app-hero .badge { background: rgba(255,255,255,0.15); color: #d4e8c2; padding: 0.3rem 0.9rem; border-radius: 20px; font-size: 0.75rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 1rem; display: inline-block; }
+    .app-hero h1 { font-family: 'Playfair Display', serif; font-size: 2.5rem; margin-bottom: 0.75rem; }
+    .app-hero p { color: rgba(255,255,255,0.8); font-size: 1rem; max-width: 550px; margin: 0 auto; }
+
+    .app-layout { display: grid; grid-template-columns: 300px 1fr; gap: 1.5rem; max-width: 1100px; margin: 2rem auto; padding: 0 1.5rem; flex: 1; }
+    @media (max-width: 768px) { .app-layout { grid-template-columns: 1fr; } nav .nav-links { display: none; } }
+
+    .sidebar { display: flex; flex-direction: column; gap: 1rem; }
+    .card { background: var(--white); border-radius: 14px; padding: 1.25rem; box-shadow: 0 2px 12px rgba(0,0,0,0.06); }
+    .card h3 { font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; color: var(--muted); margin-bottom: 0.85rem; }
+
+    .prompt-btn { width: 100%; text-align: left; background: var(--sand); border: none; border-radius: 8px; padding: 0.65rem 0.85rem; font-family: 'Inter', sans-serif; font-size: 0.85rem; color: var(--forest); font-weight: 500; cursor: pointer; transition: background 0.2s, transform 0.1s; display: block; margin-bottom: 0.5rem; }
+    .prompt-btn:hover { background: #ead8c0; transform: translateX(2px); }
+    .prompt-btn .emoji { margin-right: 0.5rem; }
+
+    .mode-btn { width: 100%; padding: 0.6rem; border: 2px solid #e5e7eb; background: none; border-radius: 8px; font-family: 'Inter', sans-serif; font-size: 0.85rem; font-weight: 500; cursor: pointer; transition: all 0.2s; margin-bottom: 0.4rem; color: var(--muted); }
+    .mode-btn.active { border-color: var(--forest); background: #edf7ee; color: var(--forest); font-weight: 600; }
+
+    .chat-area { display: flex; flex-direction: column; gap: 1rem; }
+    .messages { background: var(--white); border-radius: 14px; padding: 1.5rem; min-height: 420px; max-height: 520px; overflow-y: auto; box-shadow: 0 2px 12px rgba(0,0,0,0.06); display: flex; flex-direction: column; gap: 1rem; }
+
+    .message { display: flex; gap: 0.85rem; animation: slideIn 0.3s ease; }
+    .message.user { flex-direction: row-reverse; }
+    @keyframes slideIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+    .avatar { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; flex-shrink: 0; }
+    .avatar.ai { background: var(--forest); }
+    .avatar.user { background: var(--accent); }
+
+    .bubble { max-width: 80%; padding: 0.9rem 1.1rem; border-radius: 16px; font-size: 0.92rem; line-height: 1.65; }
+    .message.ai .bubble { background: var(--sky); color: var(--text); border-bottom-left-radius: 4px; }
+    .message.user .bubble { background: var(--forest); color: #fff; border-bottom-right-radius: 4px; }
+    .bubble .ai-label { font-weight: 700; display: block; margin-bottom: 0.3rem; color: var(--forest); }
+    .bubble ul { padding-left: 1.2rem; margin-top: 0.4rem; }
+    .bubble li { margin-bottom: 0.3rem; }
+
+    .typing .bubble { display: flex; align-items: center; gap: 4px; padding: 1rem 1.2rem; }
+    .dot { width: 8px; height: 8px; background: var(--muted); border-radius: 50%; animation: bounce 1.4s infinite ease-in-out; }
+    .dot:nth-child(2) { animation-delay: 0.2s; }
+    .dot:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes bounce { 0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; } 40% { transform: scale(1); opacity: 1; } }
+
+    .input-area { background: var(--white); border-radius: 14px; padding: 1rem; box-shadow: 0 2px 12px rgba(0,0,0,0.06); display: flex; gap: 0.75rem; align-items: flex-end; }
+    .input-area textarea { flex: 1; border: 2px solid #e5e7eb; border-radius: 10px; padding: 0.75rem 1rem; font-family: 'Inter', sans-serif; font-size: 0.9rem; resize: none; outline: none; min-height: 48px; max-height: 150px; transition: border-color 0.2s; color: var(--text); }
+    .input-area textarea:focus { border-color: var(--forest); }
+    .send-btn { background: var(--forest); color: #fff; border: none; border-radius: 10px; padding: 0.75rem 1.25rem; font-family: 'Inter', sans-serif; font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: background 0.2s, transform 0.1s; white-space: nowrap; }
+    .send-btn:hover:not(:disabled) { background: var(--forest-light); transform: translateY(-1px); }
+    .send-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    footer { text-align: center; padding: 1.5rem; color: var(--muted); font-size: 0.8rem; margin-top: auto; }
+    footer a { color: var(--forest); text-decoration: none; font-weight: 600; }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="brand">🌿 Merrill Kersey</a>
+  <div class="nav-links">
+    <a href="index.html">Home</a>
+    <a href="resume.html">Résumé</a>
+    <a href="scratch.html">Explore</a>
+    <a href="app.html">Travel AI</a>
+  </div>
+</nav>
+
+<div class="app-hero">
+  <div class="badge">✦ AI-Powered Tool</div>
+  <h1>🌍 Travel AI Assistant</h1>
+  <p>Your personal travel planner. Get destination picks, packing lists, itineraries, and travel tips.</p>
+</div>
+
+<div class="app-layout">
+  <div class="sidebar">
+    <div class="card">
+      <h3>Quick Prompts</h3>
+      <button class="prompt-btn" onclick="usePrompt(this)"><span class="emoji">🏔️</span>Best destinations for hiking</button>
+      <button class="prompt-btn" onclick="usePrompt(this)"><span class="emoji">🎒</span>5-day Europe packing list</button>
+      <button class="prompt-btn" onclick="usePrompt(this)"><span class="emoji">💰</span>Budget travel tips for Asia</button>
+      <button class="prompt-btn" onclick="usePrompt(this)"><span class="emoji">🌊</span>Top coastal road trips USA</button>
+      <button class="prompt-btn" onclick="usePrompt(this)"><span class="emoji">🗓️</span>2-week Japan itinerary</button>
+      <button class="prompt-btn" onclick="usePrompt(this)"><span class="emoji">🌿</span>Best national parks to visit</button>
+    </div>
+    <div class="card">
+      <h3>Travel Mode</h3>
+      <button class="mode-btn active" onclick="setMode('adventure', this)">🏕️ Adventure & Nature</button>
+      <button class="mode-btn" onclick="setMode('culture', this)">🏛️ Culture & History</button>
+      <button class="mode-btn" onclick="setMode('budget', this)">💸 Budget Traveler</button>
+      <button class="mode-btn" onclick="setMode('luxury', this)">✨ Luxury & Comfort</button>
+    </div>
+  </div>
+
+  <div class="chat-area">
+    <div class="messages" id="messages">
+      <div class="message ai">
+        <div class="avatar ai">🌿</div>
+        <div class="bubble">
+          <span class="ai-label">Travel AI</span>
+          Hey there, adventurer! 🌍 I'm your AI travel assistant. Whether you're planning a backpacking trip through Patagonia, a budget euro trip, or just looking for your next national park — I'm here to help.<br><br>
+          Ask me anything: destination ideas, packing lists, itineraries, cultural tips, or budget hacks. What's your next adventure?
+        </div>
+      </div>
+    </div>
+
+    <div class="input-area">
+      <textarea id="userInput" placeholder="Ask about destinations, packing, itineraries..." rows="1"
+        onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
+      <button class="send-btn" id="sendBtn" onclick="sendMessage()">Send ✈️</button>
+    </div>
+  </div>
+</div>
+
+<footer>
+  Part of <a href="index.html">Merrill Kersey's Portfolio</a> &mdash;
+  <a href="scratch.html">Travel & Nature</a> &mdash;
+  <a href="resume.html">Résumé</a>
+</footer>
+
+<script>
+  let travelMode = 'adventure';
+
+  const modeIntros = {
+    adventure: "Switched to 🏕️ <strong>Adventure & Nature</strong> mode! I'll focus on outdoor activities, hiking, camping, and wild places. What adventure are you planning?",
+    culture: "Switched to 🏛️ <strong>Culture & History</strong> mode! I'll focus on museums, local cuisine, landmarks, and authentic cultural experiences. Where are you headed?",
+    budget: "Switched to 💸 <strong>Budget Traveler</strong> mode! I'll help you maximize every dollar — cheap flights, hostels, free attractions, and money-saving hacks. What's your destination?",
+    luxury: "Switched to ✨ <strong>Luxury & Comfort</strong> mode! I'll focus on world-class hotels, fine dining, exclusive experiences, and premium travel. Where would you like to indulge?"
+  };
+
+  // ─── Pre-written response bank ───────────────────────────────────────────
+  const responses = [
+    {
+      keywords: ['hiking', 'hike', 'trek', 'trail', 'best destinations'],
+      adventure: `Great choice! Here are my top hiking destinations: 🏔️<br><br>
+        <ul>
+          <li><strong>Zion National Park, Utah</strong> — The Narrows and Angels Landing are bucket-list trails</li>
+          <li><strong>Patagonia, Argentina/Chile</strong> — Torres del Paine W Trek is unmatched for scenery</li>
+          <li><strong>Swiss Alps</strong> — Eiger Trail and Via Alpina offer world-class alpine routes</li>
+          <li><strong>Banff, Canada</strong> — Lake Louise and Plain of Six Glaciers are stunning</li>
+          <li><strong>Appalachian Trail, USA</strong> — Classic long-distance adventure through 14 states</li>
+        </ul><br>
+        Pro tip: Always research permit requirements in advance — Zion's Narrows and Angels Landing require reservations now! 🎫`,
+      culture: `For hiking with rich cultural context, consider:<br><br>
+        <ul>
+          <li><strong>Camino de Santiago, Spain</strong> — Ancient pilgrimage route with incredible history</li>
+          <li><strong>Inca Trail, Peru</strong> — Trek to Machu Picchu through Incan ruins</li>
+          <li><strong>Mount Fuji, Japan</strong> — Sacred peak with incredible cultural significance</li>
+          <li><strong>Cinque Terre, Italy</strong> — Coastal trails connecting colorful medieval villages</li>
+        </ul>`,
+      budget: `Best budget hiking destinations:<br><br>
+        <ul>
+          <li><strong>National Forests, USA</strong> — Often free, less crowded than National Parks</li>
+          <li><strong>Slovenia</strong> — Triglav National Park is stunning and very affordable</li>
+          <li><strong>Nepal</strong> — Annapurna Circuit is epic and surprisingly cheap</li>
+          <li><strong>Portugal</strong> — Rota Vicentina coastal walk, low cost of living</li>
+        </ul>
+        Tip: America the Beautiful Pass ($80/year) covers all US National Parks! 💪`,
+      luxury: `For a luxury hiking experience:<br><br>
+        <ul>
+          <li><strong>Explora Patagonia, Chile</strong> — Guided hikes with 5-star lodge stays</li>
+          <li><strong>Swiss Alps Hut-to-Hut</strong> — Stay in mountain hotels each night</li>
+          <li><strong>Bhutan</strong> — Exclusive trekking permits keep crowds low; incredible scenery</li>
+          <li><strong>New Zealand Milford Track</strong> — Guided walk with private lodge accommodation</li>
+        </ul>`
+    },
+    {
+      keywords: ['pack', 'packing', 'bag', 'luggage', 'what to bring', 'europe'],
+      adventure: `Here's my go-to adventure packing list for 5 days in Europe: 🎒<br><br>
+        <ul>
+          <li><strong>Clothing:</strong> 3 merino wool t-shirts, 1 fleece, waterproof jacket, 2 pants, 5 socks/underwear</li>
+          <li><strong>Footwear:</strong> Trail runners (doubles for hiking + walking) + lightweight sandals</li>
+          <li><strong>Tech:</strong> Universal adapter, portable charger, offline maps downloaded</li>
+          <li><strong>Essentials:</strong> Microfiber towel, headlamp, reusable water bottle, first aid kit</li>
+          <li><strong>Documents:</strong> Passport, travel insurance card, digital copies of everything</li>
+        </ul><br>
+        Golden rule: If your bag weighs more than 10kg, leave something behind! ✂️`,
+      culture: `5-day Europe cultural packing list: 🏛️<br><br>
+        <ul>
+          <li><strong>Smart casual clothes</strong> — Many European churches require covered shoulders/knees</li>
+          <li><strong>Comfortable walking shoes</strong> — You'll log 10-15 miles a day on cobblestones</li>
+          <li><strong>Day bag</strong> — Small backpack for museums and day trips</li>
+          <li><strong>Journal</strong> — For capturing experiences and sketching landmarks</li>
+          <li><strong>Phrasebook or translation app</strong> — Locals appreciate the effort!</li>
+        </ul>`,
+      budget: `Budget-smart packing for Europe: 💸<br><br>
+        <ul>
+          <li>Pack carry-on ONLY — saves $50-100 per flight in baggage fees</li>
+          <li>Bring a reusable water bottle — tap water is safe across most of Europe</li>
+          <li>Packable rain jacket — cheaper than buying one there if caught in a storm</li>
+          <li>Unlocked phone + local SIM card — way cheaper than roaming charges</li>
+          <li>Padlock for hostel lockers — essential for keeping your stuff safe</li>
+        </ul>`,
+      luxury: `Luxury European packing essentials: ✨<br><br>
+        <ul>
+          <li>2-3 elevated outfits for fine dining and theater</li>
+          <li>Quality leather shoes — worth it on European city streets</li>
+          <li>Noise-canceling headphones for business class flights</li>
+          <li>Lightweight cashmere layer for cool evenings</li>
+          <li>Personal care kit — your hotel will have amenities but your favorites matter</li>
+        </ul>`
+    },
+    {
+      keywords: ['budget', 'cheap', 'affordable', 'save money', 'asia'],
+      adventure: `Budget adventure travel in Asia — it's very doable! 🌏<br><br>
+        <ul>
+          <li><strong>Thailand</strong> — $30-40/day covers accommodation, food, and transport</li>
+          <li><strong>Vietnam</strong> — Street food meals for $1-2, hostels from $8/night</li>
+          <li><strong>Nepal</strong> — Annapurna trekking is world-class and surprisingly affordable</li>
+          <li><strong>Indonesia</strong> — Bali on $50/day is totally achievable</li>
+        </ul><br>
+        <strong>Top money tips:</strong>
+        <ul>
+          <li>Eat where locals eat — street food is often safer AND tastier</li>
+          <li>Travel by overnight bus/train to save on accommodation</li>
+          <li>Book flights 6-8 weeks out for best prices</li>
+          <li>Use Wise or Revolut for no-fee currency exchange</li>
+        </ul>`,
+      budget: `Asia on a shoestring — here's the playbook: 💸<br><br>
+        <ul>
+          <li><strong>Southeast Asia</strong> is the budget traveler's paradise — Vietnam, Cambodia, Thailand</li>
+          <li>Fly into Bangkok or Kuala Lumpur (cheapest hubs)</li>
+          <li>Use budget airlines like AirAsia for hops between countries</li>
+          <li>Couchsurf or use hostels ($5-12/night in most of SE Asia)</li>
+          <li>Avoid tourist restaurants near landmarks — walk 2 blocks and prices drop 60%</li>
+          <li>Negotiate tuk-tuks and taxis before you get in</li>
+        </ul>
+        Realistic budget: $35-50/day covers everything in Southeast Asia comfortably.`,
+      culture: `Asia on a budget with cultural depth: 🏛️<br><br>
+        <ul>
+          <li><strong>Japan</strong> — More affordable than you think with a JR Pass and budget ryokans</li>
+          <li><strong>India</strong> — Incredible history, amazing food, very low cost</li>
+          <li><strong>Taiwan</strong> — Underrated gem, excellent food scene, cheap transport</li>
+          <li><strong>Sri Lanka</strong> — Ancient temples, tea plantations, beaches — all budget-friendly</li>
+        </ul>`,
+      luxury: `Luxury Asia doesn't have to break the bank compared to Europe: ✨<br><br>
+        <ul>
+          <li><strong>Maldives</strong> — Overwater bungalows are iconic and worth every penny</li>
+          <li><strong>Bali</strong> — Private villa with pool for $150-200/night is incredible value</li>
+          <li><strong>Japan</strong> — A traditional ryokan with kaiseki dinner is unforgettable</li>
+          <li><strong>Singapore</strong> — Marina Bay Sands infinity pool is a must</li>
+        </ul>`
+    },
+    {
+      keywords: ['road trip', 'coastal', 'drive', 'car', 'usa', 'america'],
+      adventure: `Top coastal road trips in the USA: 🌊<br><br>
+        <ul>
+          <li><strong>Pacific Coast Highway (CA)</strong> — SF to San Diego, Big Sur is the highlight — 6-8 days</li>
+          <li><strong>Oregon Coast</strong> — Hwy 101, dramatic cliffs, hidden beaches, charming towns — 4-5 days</li>
+          <li><strong>Olympic Peninsula, WA</strong> — Rainforests, wild beaches, and mountain views — 3-4 days</li>
+          <li><strong>Florida Keys (US-1)</strong> — Miami to Key West over stunning causeways — 2-3 days</li>
+          <li><strong>Acadia Loop, Maine</strong> — Rugged northeastern coastline at its finest — 3-4 days</li>
+        </ul><br>
+        My personal favorite: Big Sur on PCH at sunrise — absolutely breathtaking. 🌅`,
+      culture: `Coastal road trips with amazing food + culture: 🍽️<br><br>
+        <ul>
+          <li><strong>New England Coast</strong> — Boston to Bar Harbor, lobster rolls and lighthouses</li>
+          <li><strong>Gulf Coast</strong> — New Orleans to Pensacola, incredible music and Cajun food</li>
+          <li><strong>Pacific Coast Highway</strong> — Wine country in Santa Barbara, farm-to-table in Carmel</li>
+        </ul>`,
+      budget: `Budget coastal road trips: 💰<br><br>
+        <ul>
+          <li>Camp at state parks along the route — $20-35/night vs $150+ for hotels</li>
+          <li>Cook your own meals — a cooler + camp stove saves $40-60/day</li>
+          <li>Oregon Coast is one of the most affordable — free beach access everywhere</li>
+          <li>Avoid summer weekends — prices drop and crowds thin dramatically</li>
+        </ul>`,
+      luxury: `Luxury coastal road trips: ✨<br><br>
+        <ul>
+          <li>PCH with stays at Post Ranch Inn (Big Sur) — most romantic hotel in America</li>
+          <li>Napa Valley detour for wine tasting and farm-to-table dining</li>
+          <li>Carmel-by-the-Sea — boutique hotels, world-class golf at Pebble Beach</li>
+        </ul>`
+    },
+    {
+      keywords: ['japan', 'tokyo', 'kyoto', 'osaka', 'itinerary', '2 week', 'two week'],
+      adventure: `2-Week Japan Itinerary — Adventure Edition: 🗾<br><br>
+        <strong>Days 1-3: Tokyo</strong>
+        <ul><li>Shinjuku, Shibuya crossing, day hike on Mount Takao</li></ul>
+        <strong>Days 4-5: Hakone</strong>
+        <ul><li>Mt. Fuji views, ryokan stay, onsen experience</li></ul>
+        <strong>Days 6-8: Kyoto</strong>
+        <ul><li>Fushimi Inari hike at dawn, bamboo forest, Arashiyama</li></ul>
+        <strong>Days 9-10: Osaka</strong>
+        <ul><li>Street food in Dotonbori, day trip to Nara deer park</li></ul>
+        <strong>Days 11-12: Hiroshima + Miyajima</strong>
+        <ul><li>Peace Memorial Museum, Itsukushima Shrine at high tide</li></ul>
+        <strong>Days 13-14: Back to Tokyo</strong>
+        <ul><li>Day trip to Nikko shrines, last-minute shopping in Akihabara</li></ul><br>
+        Get the JR Pass before you leave home — saves a ton on bullet trains! 🚄`,
+      culture: `2-Week Japan Cultural Deep Dive: 🏯<br><br>
+        Focus on Kyoto (4 nights) for temples, geisha districts, traditional tea ceremony. Add Nara, Hiroshima, and the art islands of the Seto Inland Sea. Tokyo gets 3-4 nights for museums, theater, and food culture. Book a cooking class and a traditional ryokan for authentic immersion.`,
+      budget: `2 Weeks in Japan — Budget Tips: 💴<br><br>
+        <ul>
+          <li>JR Pass ($500) covers most bullet train travel — worth it for 2 weeks</li>
+          <li>7-Eleven and FamilyMart onigiri for breakfast — $1-2 and delicious</li>
+          <li>Capsule hotels in Tokyo: $40-60/night, cool experience</li>
+          <li>Most temples/shrines are free or under $5 to enter</li>
+          <li>Realistic budget: $80-100/day including transport</li>
+        </ul>`,
+      luxury: `Luxury Japan 2-Week Itinerary: ✨<br><br>
+        Stay at the Park Hyatt Tokyo (Lost in Translation hotel), a traditional ryokan in Hakone with private onsen, and the Ritz-Carlton Kyoto. Book a private tea ceremony, sake tasting, and sushi omakase counter experience. Charter a private guide for hidden temple access in Kyoto.`
+    },
+    {
+      keywords: ['national park', 'parks', 'yellowstone', 'grand canyon', 'yosemite', 'zion'],
+      adventure: `Best US National Parks for Adventure: 🏞️<br><br>
+        <ul>
+          <li><strong>Zion, Utah</strong> — The Narrows, Angels Landing, incredible slot canyons</li>
+          <li><strong>Yosemite, CA</strong> — Half Dome, El Capitan, world-class climbing</li>
+          <li><strong>Yellowstone, WY</strong> — Geysers, wildlife (bison, wolves, bears), backcountry</li>
+          <li><strong>Grand Teton, WY</strong> — Dramatic peaks, excellent hiking, great wildlife</li>
+          <li><strong>Olympic, WA</strong> — Rainforests + glaciers + wild coastline in one park</li>
+          <li><strong>Grand Canyon, AZ</strong> — Rim-to-rim backpacking is a lifetime achievement</li>
+          <li><strong>Glacier, MT</strong> — Going-to-the-Sun Road + pristine alpine wilderness</li>
+        </ul><br>
+        Pro tip: Get the <strong>America the Beautiful Pass ($80)</strong> — covers all parks for a year! 🎫`,
+      budget: `National Parks on a budget: 💵<br><br>
+        <ul>
+          <li>America the Beautiful Pass = $80/year for unlimited entry — pays for itself in 2 parks</li>
+          <li>Camp inside parks vs staying in gateway towns — saves $50-80/night</li>
+          <li>Visit shoulder season (April-May or September-October) — cheaper and less crowded</li>
+          <li>Check National Forest land bordering parks — often free camping nearby</li>
+        </ul>`,
+      culture: `National Parks with cultural significance: 🏛️<br><br>
+        <ul>
+          <li><strong>Mesa Verde, CO</strong> — Ancient Ancestral Puebloan cliff dwellings</li>
+          <li><strong>Chaco Culture, NM</strong> — Stunning prehistoric ruins and astronomical alignments</li>
+          <li><strong>Hawaii Volcanoes</strong> — Active lava flows and deep Hawaiian cultural history</li>
+          <li><strong>Grand Canyon</strong> — Sacred to many Native American tribes, incredible history</li>
+        </ul>`,
+      luxury: `National Park luxury experiences: ✨<br><br>
+        <ul>
+          <li><strong>The Ahwahnee, Yosemite</strong> — Historic lodge right in the valley</li>
+          <li><strong>Under Canvas glamping</strong> — Luxury tents near Yellowstone, Zion, and Grand Canyon</li>
+          <li><strong>Clayoquot Wilderness Resort, BC</strong> — Remote Canadian wilderness, float-plane access</li>
+          <li>Private guided tours beat ranger tours for access and depth</li>
+        </ul>`
+    }
+  ];
+
+  const fallbackResponses = [
+    `That's a great travel question! 🌍 Here's what I'd suggest:<br><br>
+      Start by narrowing down your destination by asking yourself three things: What kind of experience do you want (adventure, relaxation, culture)? What's your budget range? And how much time do you have?<br><br>
+      Once you have those answers, I can give you much more targeted recommendations. Try one of the quick prompts on the left to get started, or tell me your dream destination! ✈️`,
+
+    `Great question! Every trip is different, but here are my universal travel tips: 🗺️<br><br>
+      <ul>
+        <li>Book flights 6-8 weeks out for the sweet spot of price vs. availability</li>
+        <li>Always get travel insurance — it's saved me multiple times</li>
+        <li>Pack lighter than you think you need to — you can always buy things there</li>
+        <li>Download offline maps before you arrive — data can be spotty abroad</li>
+        <li>Talk to locals — they always know the best spots that aren't in any guidebook</li>
+      </ul><br>
+      Want recommendations for a specific destination? Just ask! 🌟`,
+
+    `Awesome — I love helping plan adventures! 🧭 Here's a starting framework for any trip:<br><br>
+      <ul>
+        <li><strong>1-3 days:</strong> Focus on one city or region, go deep not wide</li>
+        <li><strong>5-7 days:</strong> One country, 2-3 highlights, comfortable pace</li>
+        <li><strong>2 weeks:</strong> Regional route or one country thoroughly explored</li>
+        <li><strong>1 month+:</strong> Go slow, blend in, live like a local</li>
+      </ul><br>
+      Tell me your destination and trip length and I'll build you a full itinerary! 🗓️`
+  ];
+
+  let fallbackIndex = 0;
+
+  function setMode(mode, btn) {
+    travelMode = mode;
+    document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    addMessage('ai', modeIntros[mode]);
+  }
+
+  function usePrompt(btn) {
+    const text = btn.textContent.replace(/^[\S]+\s/, '').trim();
+    document.getElementById('userInput').value = text;
+    document.getElementById('userInput').focus();
+  }
+
+  function autoResize(textarea) {
+    textarea.style.height = 'auto';
+    textarea.style.height = Math.min(textarea.scrollHeight, 150) + 'px';
+  }
+
+  function handleKey(e) {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+  }
+
+  function addMessage(role, htmlContent) {
+    const messages = document.getElementById('messages');
+    const div = document.createElement('div');
+    div.className = `message ${role}`;
+    div.innerHTML = role === 'ai'
+      ? `<div class="avatar ai">🌿</div><div class="bubble"><span class="ai-label">Travel AI</span>${htmlContent}</div>`
+      : `<div class="avatar user">👤</div><div class="bubble">${htmlContent}</div>`;
+    messages.appendChild(div);
+    messages.scrollTop = messages.scrollHeight;
+  }
+
+  function addTyping() {
+    const messages = document.getElementById('messages');
+    const div = document.createElement('div');
+    div.className = 'message ai typing';
+    div.id = 'typingIndicator';
+    div.innerHTML = `<div class="avatar ai">🌿</div><div class="bubble"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>`;
+    messages.appendChild(div);
+    messages.scrollTop = messages.scrollHeight;
+  }
+
+  function removeTyping() {
+    const el = document.getElementById('typingIndicator');
+    if (el) el.remove();
+  }
+
+  function getResponse(text) {
+    const lower = text.toLowerCase();
+    for (const r of responses) {
+      if (r.keywords.some(k => lower.includes(k))) {
+        return r[travelMode] || r['adventure'];
+      }
+    }
+    // Rotate through fallbacks
+    const reply = fallbackResponses[fallbackIndex % fallbackResponses.length];
+    fallbackIndex++;
+    return reply;
+  }
+
+  function sendMessage() {
+    const input = document.getElementById('userInput');
+    const sendBtn = document.getElementById('sendBtn');
+    const text = input.value.trim();
+    if (!text) return;
+
+    addMessage('user', text);
+    input.value = '';
+    input.style.height = 'auto';
+    sendBtn.disabled = true;
+    addTyping();
+
+    // Simulate typing delay
+    setTimeout(() => {
+      removeTyping();
+      addMessage('ai', getResponse(text));
+      sendBtn.disabled = false;
+      input.focus();
+    }, 1200 + Math.random() * 800);
+  }
+</script>
+</body>
+</html>

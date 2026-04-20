@@ -1,0 +1,314 @@
+/* ===========================
+   custom2.css — Scratch Page
+   Merrill Kersey — Travel & Nature
+   =========================== */
+
+/* Google Fonts loaded inline in scratch.html */
+
+/* === CSS Variables === */
+:root {
+  --forest: #2d5a27;
+  --sky: #3a7ebf;
+  --sand: #e8d5a3;
+  --stone: #5a5a4a;
+  --cream: #faf7f0;
+  --white: #ffffff;
+  --dark: #1a1a1a;
+  --accent: #e07b39;
+}
+
+/* === Base === */
+body {
+  background-color: var(--cream);
+  font-family: 'Lora', Georgia, serif;
+  color: var(--dark);
+  margin: 0;
+  padding: 0;
+}
+
+/* ===========================
+   DIV 1: Navigation Bar
+   =========================== */
+div#scratch-nav {
+  background-color: var(--forest);
+  padding: 1rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.25);
+}
+
+div#scratch-nav .nav-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.5rem;
+  color: var(--sand);
+  letter-spacing: 0.05em;
+  text-decoration: none;
+}
+
+div#scratch-nav .nav-links a {
+  color: rgba(255,255,255,0.85);
+  text-decoration: none;
+  margin-left: 1.5rem;
+  font-family: 'Open Sans', sans-serif;
+  font-size: 0.9rem;
+  letter-spacing: 0.04em;
+  transition: color 0.2s;
+}
+
+div#scratch-nav .nav-links a:hover {
+  color: var(--sand);
+}
+
+/* ===========================
+   DIV 2: Hero / Header
+   =========================== */
+div#scratch-hero {
+  background-image: url('https://images.unsplash.com/photo-1501854140801-50d01698950b?w=1600&q=80');
+  background-size: cover;
+  background-position: center 40%;
+  background-attachment: fixed;
+  min-height: 90vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  position: relative;
+}
+
+div#scratch-hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0.55) 100%);
+}
+
+div#scratch-hero .hero-content {
+  position: relative;
+  z-index: 2;
+  max-width: 800px;
+  padding: 2rem;
+}
+
+div#scratch-hero h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: 4rem;
+  color: var(--white);
+  margin-bottom: 1rem;
+  text-shadow: 0 2px 12px rgba(0,0,0,0.5);
+}
+
+div#scratch-hero p {
+  font-family: 'Lora', serif;
+  font-size: 1.25rem;
+  color: rgba(255,255,255,0.9);
+  margin-bottom: 2rem;
+  font-style: italic;
+}
+
+div#scratch-hero .hero-btn {
+  background-color: var(--accent);
+  color: #fff;
+  border: none;
+  padding: 0.85rem 2.5rem;
+  font-family: 'Open Sans', sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  border-radius: 50px;
+  text-decoration: none;
+  display: inline-block;
+  transition: background 0.2s, transform 0.15s;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+div#scratch-hero .hero-btn:hover {
+  background-color: #c4602a;
+  transform: translateY(-2px);
+}
+
+/* ===========================
+   DIV 3: Main Content Area
+   =========================== */
+div#scratch-content {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 3rem 1.5rem;
+}
+
+div#scratch-content h2 {
+  font-family: 'Playfair Display', serif;
+  color: var(--forest);
+  font-size: 2rem;
+  border-bottom: 3px solid var(--sand);
+  padding-bottom: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+div#scratch-content p {
+  font-family: 'Lora', serif;
+  font-size: 1.05rem;
+  line-height: 1.9;
+  color: #3a3a2e;
+  margin-bottom: 1.2rem;
+}
+
+/* Section dividers */
+.scratch-section {
+  margin-bottom: 4rem;
+}
+
+/* Destination image grid */
+.dest-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.5rem;
+  margin: 2rem 0;
+}
+
+.dest-card {
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+  transition: transform 0.25s;
+}
+
+.dest-card:hover {
+  transform: translateY(-5px);
+}
+
+.dest-card img {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  display: block;
+}
+
+.dest-card .dest-label {
+  background: var(--forest);
+  color: var(--sand);
+  font-family: 'Open Sans', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 700;
+  padding: 0.75rem 1rem;
+  letter-spacing: 0.05em;
+}
+
+/* Lists */
+ol.travel-list {
+  font-family: 'Lora', serif;
+  font-size: 1rem;
+  color: var(--stone);
+  padding-left: 1.5rem;
+  line-height: 2;
+}
+
+ol.travel-list li {
+  margin-bottom: 0.5rem;
+}
+
+ul.gear-list {
+  list-style: none;
+  padding-left: 0.5rem;
+}
+
+ul.gear-list li::before {
+  content: '✦';
+  color: var(--accent);
+  margin-right: 0.6rem;
+  font-size: 0.75rem;
+}
+
+/* Anchor target highlight */
+.anchor-target {
+  scroll-margin-top: 80px;
+}
+
+/* Video wrapper */
+.video-wrapper {
+  position: relative;
+  padding-bottom: 56.25%;
+  height: 0;
+  overflow: hidden;
+  border-radius: 12px;
+  box-shadow: 0 6px 30px rgba(0,0,0,0.15);
+  margin: 2rem 0;
+}
+
+.video-wrapper iframe {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  border: none;
+}
+
+/* Quote block */
+.travel-quote {
+  border-left: 5px solid var(--accent);
+  padding: 1rem 1.5rem;
+  background: rgba(232, 213, 163, 0.25);
+  border-radius: 0 8px 8px 0;
+  font-style: italic;
+  font-size: 1.15rem;
+  color: var(--stone);
+  margin: 2rem 0;
+}
+
+/* Tableau wrapper */
+.tableau-wrapper {
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.1);
+  margin: 2rem 0;
+}
+
+/* App CTA */
+.app-cta {
+  background: linear-gradient(135deg, var(--forest), #4a8a43);
+  color: #fff;
+  border-radius: 16px;
+  padding: 2.5rem;
+  text-align: center;
+  margin: 3rem 0;
+}
+
+.app-cta h3 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.8rem;
+  margin-bottom: 0.75rem;
+}
+
+.app-cta p {
+  color: rgba(255,255,255,0.85);
+  margin-bottom: 1.5rem;
+}
+
+.app-cta a {
+  background: var(--accent);
+  color: #fff;
+  padding: 0.75rem 2rem;
+  border-radius: 50px;
+  text-decoration: none;
+  font-family: 'Open Sans', sans-serif;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  transition: background 0.2s;
+}
+
+.app-cta a:hover {
+  background: #c4602a;
+}
+
+/* Footer */
+footer#scratch-footer {
+  background-color: var(--forest);
+  color: rgba(255,255,255,0.6);
+  text-align: center;
+  padding: 1.5rem;
+  font-family: 'Open Sans', sans-serif;
+  font-size: 0.85rem;
+}
