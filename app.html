@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Travel AI | Merrill Kersey</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --forest: #1e4d2b;
+      --forest-light: #2d6b3f;
+      --sky: #e8f4fd;
+      --sand: #f5ede0;
+      --accent: #e07b39;
+      --white: #ffffff;
+      --gray: #f0f0ec;
+      --text: #1a1a1a;
+      --muted: #6b7280;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Inter', sans-serif; background: var(--gray); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; }
+
+    nav { background: var(--forest); padding: 0.9rem 2rem; display: flex; justify-content: space-between; align-items: center; }
+    nav .brand { font-family: 'Playfair Display', serif; color: #d4e8c2; font-size: 1.25rem; text-decoration: none; }
+    nav .nav-links a { color: rgba(255,255,255,0.8); text-decoration: none; margin-left: 1.5rem; font-size: 0.88rem; font-weight: 500; }
+
+    .app-hero { background: linear-gradient(135deg, var(--forest) 0%, #3a7a4a 100%); color: white; padding: 3rem 2rem; text-align: center; }
+    .app-hero h1 { font-family: 'Playfair Display', serif; font-size: 2.5rem; }
+
+    .app-layout { display: grid; grid-template-columns: 300px 1fr; gap: 1.5rem; max-width: 1100px; margin: 2rem auto; padding: 0 1.5rem; }
+
+    .card { background: var(--white); border-radius: 14px; padding: 1.25rem; }
+    .prompt-btn { width: 100%; margin-bottom: 0.5rem; padding: 0.6rem; background: var(--sand); border: none; border-radius: 8px; cursor: pointer; }
+
+    .messages { background: white; padding: 1rem; min-height: 300px; border-radius: 10px; }
+    .input-area { display: flex; gap: 0.5rem; margin-top: 1rem; }
+    textarea { flex: 1; padding: 0.5rem; }
+    .send-btn { background: var(--forest); color: white; padding: 0.5rem 1rem; border: none; }
+
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html">Home</a>
+  <a href="scratch.html">Explore</a>
+</nav>
+
+<div class="app-hero">
+  <h1>🌍 Travel AI Assistant</h1>
+</div>
+
+<div class="app-layout">
+  <div>
+    <div class="card">
+      <button class="prompt-btn" onclick="usePrompt(this)">Best hiking destinations</button>
+      <button class="prompt-btn" onclick="usePrompt(this)">Europe packing list</button>
+      <button class="prompt-btn" onclick="usePrompt(this)">Budget Asia tips</button>
+    </div>
+  </div>
+
+  <div>
+    <div class="messages" id="messages"></div>
+
+    <div class="input-area">
+      <textarea id="userInput"></textarea>
+      <button class="send-btn" onclick="sendMessage()">Send</button>
+    </div>
+  </div>
+</div>
+
+<script>
+function usePrompt(btn){
+  document.getElementById('userInput').value = btn.textContent;
+}
+
+function sendMessage(){
+  let input = document.getElementById('userInput');
+  let messages = document.getElementById('messages');
+
+  let userText = input.value;
+  if(!userText) return;
+
+  messages.innerHTML += "<p><strong>You:</strong> " + userText + "</p>";
+  messages.innerHTML += "<p><strong>AI:</strong> Plan your trip based on that idea!</p>";
+
+  input.value = "";
+}
+</script>
+
+</body>
+</html>
